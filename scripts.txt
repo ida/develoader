@@ -1,0 +1,7 @@
+# Hi, this is an example scripts-list, it can contain comment-lines
+# starting with '//', '"' or '#'. Otherwise one script-path per line
+# is expected, no quotes needed.
+
+a_script.js
+folder/another_script.js
+
