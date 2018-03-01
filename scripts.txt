@@ -2,6 +2,8 @@
 # starting with '//', '"' or '#'. Otherwise one script-path per line
 # is expected, no quotes needed.
 
-a_script.js
-folder/another_script.js
+# Example file-paths (remove '#' to take effect):
+
+# a_script.js
+# folder/another_script.js
 

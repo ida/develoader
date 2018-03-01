@@ -2,9 +2,9 @@
 
 // Load scripts listed in a file and wrap them into one func.
 
-var scriptPathsFile = 'scripts.txt' // File with a path per line (no quotes).
 var scriptPaths = [] // The scripts to be loaded. You can also add paths, here.
-var appName = null  // Defaults to dir-name, you can set another name, here.
+var scriptPathsFile = 'scripts.txt' // File with a path per line (no quotes).
+var appName = null  // Defaults to dir-name. You can set another name, here.
 
 
 /*
@@ -209,8 +209,8 @@ function main() {
 
 
   // Load, wrap and insert scripts:
-  if(scriptPathsFile !== null ) getScriptPaths('scripts.txt', loadScripts)
-  else loadScripts()
+  if(scriptPathsFile !== null ) getScriptPaths(scriptPathsFile, loadScripts)
+  else if(scriptPaths.length > 0) loadScripts()
 
 
   // We don't need *this* script-ele anymore, remove it:
