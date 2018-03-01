@@ -125,8 +125,8 @@ function loadFileAndDoSthWithText(filePath, doSthWithText) {
   if(filePath.startsWith('./')) filePath = filePath.slice(2)
   if(filePath.endsWith('/')) filePath = filePath.slice(0, filePath.length-2)
   filePath = filePath.trim()
-  if( filePath != '' && ! filePath.startsWith('"') || filePath.startsWith('#')
-    || filePath.startsWith('//')) {
+  if( filePath != '' && ! filePath.startsWith('"') && ! filePath.startsWith('#')
+     && ! filePath.startsWith('//')) {
     var request = new XMLHttpRequest()
     request.overrideMimeType("text/plain") // fixes err 'not well formed'
     request.open('GET', filePath, true)
@@ -148,6 +148,7 @@ function loadFileAndDoSthWithText(filePath, doSthWithText) {
     }
     request.send()
   } // not a comment
+  else doSthWithText('') // we need to exe doSthWithText to keep the loop going
 }
 
 
