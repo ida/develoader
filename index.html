@@ -2,9 +2,13 @@
 
 // Load scripts listed in a file and wrap them into one func.
 
-var scriptPaths = [] // The scripts to be loaded. You can also add paths, here.
 var scriptPathsFile = 'scripts.txt' // File with a path per line (no quotes).
-var appName = null  // Defaults to dir-name. You can set another name, here.
+var scriptPaths = [] // Optionally add paths here, they'll precede the loaded.
+var appName = null  // Defaults to dir-name. You can set another name here.
+
+// For external scripts one can add paths starting with '../' or 'http'.
+// The app's internal script-paths must be relative to this directory
+// and live in it. They can start with './'.
 
 
 /*
@@ -55,7 +59,9 @@ Or use the shell-script of this directory and execute it of the commandline:
 
   . create_ordered_scripts_list.sh
 
-Then open this file index.html in a browser :-)
+
+You can also include external script-paths for loading dependencies,
+their paths must start with '../' or 'http'.
 
 
 Who
@@ -120,8 +126,18 @@ if(appName === null) {
   appName = appName[appName.length-2] // get second last split: parent-dir-name
   appName = appName.charAt(0).toUpperCase() + appName.slice(1) // capitalize name
 }
-
+function addScriptEle(scriptPath=null, scriptText=null) {
+  var scriptEle = document.createElement('script')
+  if(scriptPath !== null) scriptEle.src = scriptPath
+  else if(scriptText !== null) scriptEle.textContent = scriptText
+  document.head.appendChild(scriptEle)
+}
 function loadFileAndDoSthWithText(filePath, doSthWithText) {
+  if(filePath.startsWith('../')) {
+    addScriptEle(filePath)
+    doSthWithText('') // we need to exe doSthWithText to keep the loop going
+  }
+  else {
   if(filePath.startsWith('./')) filePath = filePath.slice(2)
   if(filePath.endsWith('/')) filePath = filePath.slice(0, filePath.length-2)
   filePath = filePath.trim()
@@ -149,6 +165,7 @@ function loadFileAndDoSthWithText(filePath, doSthWithText) {
     request.send()
   } // not a comment
   else doSthWithText('') // we need to exe doSthWithText to keep the loop going
+  }
 }
 
 
@@ -181,7 +198,6 @@ function getScriptPaths(scriptPathsFile, doAfter) {
 
 function wrapAndInsertScripts(scripts) {
 
-  var scriptEle = document.createElement('script')
   var scriptText = ''
   
   scriptText += 'function ' + appName + '(appName) {'
@@ -192,8 +208,7 @@ function wrapAndInsertScripts(scripts) {
   scriptText += '\n'
   scriptText +=  appName + '(appName)'
   
-  scriptEle.innerHTML += scriptText
-  document.head.appendChild(scriptEle)
+  addScriptEle(null, scriptText)
 }
 
 
