@@ -1,10 +1,10 @@
 <head><meta charset="utf-8"><title></title><script>
 
-// Load scripts listed in a file and wrap them into one func.
+// Load scripts listed in a file and wrap them into one function.
 
 var scriptPathsFile = 'scripts.txt' // File with a path per line (no quotes).
-var scriptPaths = [] // Optionally add paths here, they'll precede the loaded.
-var appName = null  // Defaults to dir-name. You can set another name here.
+var scriptPaths = [] // Optionally add paths here, they'll precede the above.
+var appName = null  //  Defaults to dir-name. You can set another name here.
 
 // For external scripts one can add paths starting with '../' or 'http'.
 // The app's internal script-paths must be relative to this directory
@@ -13,8 +13,9 @@ var appName = null  // Defaults to dir-name. You can set another name here.
 
 /*
 
+
 What
----
+====
 
 Read script-paths of a line-separated list in a file, wrap them into one
 single function named after this directory, and insert it as a script-ele.
@@ -28,7 +29,7 @@ Where the var 'appName' can then be used of within the loaded funcs.
 
 
 Why
----
+===
 
 
 - Define app-name only once by naming your working-directory accordingly.
@@ -39,29 +40,55 @@ Why
 
 - Isolating scripts into one function keeps the global-namespace tidy.
 
+- While everything is wrapped into one script, we can still operate in
+  several files during development.
+
 
 
 How
----
+===
+
+Usage
+-----
 
 Either write paths manually into the file, or generate a file that contains
 all found scripts of this directory, by opening a terminal and executing this:
 
     find . -type f -name "*.js" | sort > scripts.txt
 
+Where the dot stands for "this directory". You can replace it with a path of
+your choice, e.g. 'nowhere/under/the/sunsquare' (replace without brackets).
+
 That will create a file named 'scripts.txt' with found paths in reversed
 alphabetic order, so you can control load-order by prepending file-names
-with two-digit-numbers. The resulting scriptPaths then, is something like:
+with two-digit-numbers. The resulting scriptPaths then are something like:
 
 ['01_main.js', '02_style.js', '03_src/01_main.js', '03_src/02_style.js']
 
-Or use the shell-script of this directory and execute it of the commandline:
+Or use the shell-script in this directory and execute it of the commandline:
 
   . create_ordered_scripts_list.sh
 
+That searches in the current directory, optionally define another path:
+
+  . create_ordered_scripts_list.sh another/path
 
 You can also include external script-paths for loading dependencies,
 their paths must start with '../' or 'http'.
+
+The app's scripts are expected to live within this directory, their paths
+can (but don't have to') start with './'.
+
+
+
+Technically
+-----------
+
+The local, internal app-scripts are composed to one script and them inserted
+as text-content of a script-element in the head-element.
+
+The external dependency-files are inserted as script-eles in the head-ele
+loading the script via the src-attribute, as convenient.
 
 
 Who
@@ -116,28 +143,37 @@ Future features
 ///////////////////////////////////////////////////////////////////////////////
 
 
-// Get capitalized name of this file's parent-directory of the browser-address:
-if(appName === null) {
-  appName = window.location.href  // get url of browser-address-bar
-  if( appName.endsWith('/') ) {
-    appName = appName.slice(0, appName.length-2) // remove ending slash
-  }
-  appName = appName.split('/')        // split by slashes
-  appName = appName[appName.length-2] // get second last split: parent-dir-name
-  appName = appName.charAt(0).toUpperCase() + appName.slice(1) // capitalize name
-}
+
 function addScriptEle(scriptPath=null, scriptText=null) {
   var scriptEle = document.createElement('script')
   if(scriptPath !== null) scriptEle.src = scriptPath
   else if(scriptText !== null) scriptEle.textContent = scriptText
   document.head.appendChild(scriptEle)
 }
+
+
+
+function composeAndSetAppName() {
+  // Get capitalized name of this file's parent-directory of the browser-address:
+  if(appName === null) {
+    appName = window.location.href  // get url of browser-address-bar
+    if( appName.endsWith('/') ) {
+      appName = appName.slice(0, appName.length-2) // remove ending slash
+    }
+    appName = appName.split('/')        // split by slashes
+    appName = appName[appName.length-2] // get second last split: parent-dir-name
+    appName = appName.charAt(0).toUpperCase() + appName.slice(1) // capitalize name
+  }
+}
+
+
+
 function loadFileAndDoSthWithText(filePath, doSthWithText) {
-  if(filePath.startsWith('../')) {
+  if(filePath.startsWith('../') || filePath.startsWith('http')) { // is external-script
     addScriptEle(filePath)
     doSthWithText('') // we need to exe doSthWithText to keep the loop going
   }
-  else {
+  else { // is internal-script
   if(filePath.startsWith('./')) filePath = filePath.slice(2)
   if(filePath.endsWith('/')) filePath = filePath.slice(0, filePath.length-2)
   filePath = filePath.trim()
@@ -209,6 +245,7 @@ function wrapAndInsertScripts(scripts) {
   scriptText +=  appName + '(appName)'
   
   addScriptEle(null, scriptText)
+
 }
 
 
@@ -219,19 +256,30 @@ function loadScripts() {
 
 
 
+function removeThisScriptEle() {
+  var scriptEles = document.getElementsByTagName('script')
+  scriptEles[scriptEles.length-1].remove()
+}
+
+
+
+function setDocTitleToAppName() {
+  document.getElementsByTagName('title')[0].innerHTML = appName
+}
+
+
+
 function main() {
 
-  // Set document's title to be the appName:
-  document.getElementsByTagName('title')[0].innerHTML = appName
+  if(appName === null) composeAndSetAppName()
 
+  setDocTitleToAppName()
 
-  // Load, wrap and insert scripts:
   if(scriptPathsFile !== null ) getScriptPaths(scriptPathsFile, loadScripts)
   else if(scriptPaths.length > 0) loadScripts()
+  else console.info('No script-paths found to be loaded.')
 
-
-  // We don't need *this* script-ele anymore, remove it:
-  var s=document.getElementsByTagName('script');s[s.length-1].remove()
+  removeThisScriptEle()
 
 }
 
