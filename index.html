@@ -5,6 +5,7 @@
 var scriptPathsFile = 'scripts.txt' // File with a path per line (no quotes).
 var scriptPaths = [] // Optionally add paths here, they'll precede the above.
 var appName = null  //  Defaults to dir-name. You can set another name here.
+//  downloadMergedScripts() // Uncomment this line to download for production.
 
 
 /*
@@ -115,21 +116,6 @@ License
 =======
 
 MIT, a copy is attached.
-
-
-Version
-=======
-
-0.1
-
-
-Future features
----------------
-
-
-- When done with developing, export script for production by calling
-  `exportScript()` of anywhere in your scripts.
-
 
 
 */
@@ -243,16 +229,38 @@ function loadScripts() {
 
 function removeThisScriptEle() {
   var scriptEles = document.getElementsByTagName('script')
-  scriptEles[scriptEles.length-1].remove()
+  scriptEles[0].remove()
 }
 
 
 
 function setDocTitleToAppName() {
+
+  document.getElementsByTagName('title')[0].innerHTML = appName
   document.getElementsByTagName('title')[0].innerHTML = appName
 }
 
+function downloadMergedScripts() {
 
+  setTimeout(function() {
+
+    var scriptEles = document.getElementsByTagName('script')
+    var scriptEle = scriptEles[scriptEles.length-1]
+    var a = document.createElement('a')
+    var fileContent = scriptEle.innerHTML
+    var fileName = appName + '.js'
+
+    a.setAttribute('download', fileName)
+    a.textContent = 'Download'
+    a.href = 'data: application/octet-stream; charset=utf-8,'
+           + encodeURIComponent(fileContent)
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+
+  }, 27)
+
+}
 
 function main() {
 
@@ -262,7 +270,7 @@ function main() {
 
   if(scriptPathsFile !== null ) getScriptPaths(scriptPathsFile, loadScripts)
 
-  loadScripts()
+  else if(scriptPaths.length > 0) loadScripts()
 
   removeThisScriptEle()
 
