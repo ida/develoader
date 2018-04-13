@@ -9,6 +9,11 @@ var appName = null  //  Defaults to dir-name. You can set another name here.
 
 /*
 
+develoader
+==========
+
+A helper-script for developing JS-applications.
+
 
 What
 ====
@@ -20,7 +25,8 @@ The resulting wrapper-function then looks like:
 
     function Thisdirname(appName) { CONTENT_OF_LOADED_SCRIPTS }
 
-Where the var 'appName' can then be used of within the loaded scripts.
+Where the var 'appName' equals the function-name and can be used of within
+the loaded scripts.
 
 
 
@@ -47,18 +53,19 @@ How
 Usage
 -----
 
-Either write paths manually into the file, or generate a file that contains
-all found scripts of this directory, by opening a terminal and executing this:
+Either write paths manually into a file named 'scripts.txt', or generate the
+file containing all found scripts of this directory, by opening a terminal
+and executing this:
 
     find . -type f -name "*.js" | sort -V > scripts.txt
 
-That will create a file named 'scripts.txt' with found paths in numerical
-ascending order (lowest number comes first), so you can control load-order
-by choosing file-names acordingly. Verison-nrs separated with dots work, too.
-
+That will create or overwrite a file named 'scripts.txt' with found paths in
+numerical ascending order (lowest number comes first), so you can control
+load-order by choosing file-names acordingly. Version-numbers separated with
+dots work, too.
 
 The app's scripts are expected to live within this directory, their paths
-can, but don't have to, start with './'.
+can, but don't have to start with './'.
 
 You can also include external script-paths for loading dependency-scripts,
 their paths must start with '../' or 'http'.
@@ -76,25 +83,25 @@ loading the script via the src-attribute, as convenient.
 
 
 Who
----
+===
 
 Ida Ebkes <contact@ida-ebkes.eu>
 
 
 When
-----
+====
 
-This README was last touched by a human on 10th of April, 2018.
+This README was last touched by a human on 13th of April, 2018.
 
 
 Repository
-----------
+==========
 
 htps:/github.com/ida/develoader
 
 
 Feedback
---------
+========
 
 Feel free to open an issue on github to say hi or bye:
 
@@ -105,10 +112,15 @@ through my spam-killer-filters.
 
 
 License
--------
+=======
 
 MIT, a copy is attached.
 
+
+Version
+=======
+
+0.1
 
 
 Future features
