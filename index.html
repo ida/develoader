@@ -6,10 +6,6 @@ var scriptPathsFile = 'scripts.txt' // File with a path per line (no quotes).
 var scriptPaths = [] // Optionally add paths here, they'll precede the above.
 var appName = null  //  Defaults to dir-name. You can set another name here.
 
-// For external scripts one can add paths starting with '../' or 'http'.
-// The app's internal script-paths must be relative to this directory
-// and live in it. They can start with './'.
-
 
 /*
 
@@ -24,7 +20,7 @@ The resulting wrapper-function then looks like:
 
     function Thisdirname(appName) { CONTENT_OF_LOADED_SCRIPTS }
 
-Where the var 'appName' can then be used of within the loaded funcs.
+Where the var 'appName' can then be used of within the loaded scripts.
 
 
 
@@ -54,37 +50,25 @@ Usage
 Either write paths manually into the file, or generate a file that contains
 all found scripts of this directory, by opening a terminal and executing this:
 
-    find . -type f -name "*.js" | sort > scripts.txt
+    find . -type f -name "*.js" | sort -V > scripts.txt
 
-Where the dot stands for "this directory". You can replace it with a path of
-your choice, e.g. 'nowhere/under/the/sunsquare' (replace without brackets).
+That will create a file named 'scripts.txt' with found paths in numerical
+ascending order (lowest number comes first), so you can control load-order
+by choosing file-names acordingly. Verison-nrs separated with dots work, too.
 
-That will create a file named 'scripts.txt' with found paths in reversed
-alphabetic order, so you can control load-order by prepending file-names
-with two-digit-numbers. The resulting scriptPaths then are something like:
-
-['01_main.js', '02_style.js', '03_src/01_main.js', '03_src/02_style.js']
-
-Or use the shell-script in this directory and execute it of the commandline:
-
-  . create_ordered_scripts_list.sh
-
-That searches in the current directory, optionally define another path:
-
-  . create_ordered_scripts_list.sh another/path
-
-You can also include external script-paths for loading dependencies,
-their paths must start with '../' or 'http'.
 
 The app's scripts are expected to live within this directory, their paths
-can (but don't have to) start with './'.
+can, but don't have to, start with './'.
+
+You can also include external script-paths for loading dependency-scripts,
+their paths must start with '../' or 'http'.
 
 
 
 Technically
 -----------
 
-The local, internal app-scripts are composed to one script and them inserted
+The local, internal app-scripts are composed to one script and then inserted
 as text-content of a script-element in the head-element.
 
 The external dependency-files are inserted as script-eles in the head-ele
@@ -100,7 +84,7 @@ Ida Ebkes <contact@ida-ebkes.eu>
 When
 ----
 
-This README was last touched by a human on 1st March of 2018.
+This README was last touched by a human on 10th of April, 2018.
 
 
 Repository
@@ -178,25 +162,14 @@ function loadFileAndDoSthWithText(filePath, doSthWithText) {
   if(filePath.endsWith('/')) filePath = filePath.slice(0, filePath.length-2)
   filePath = filePath.trim()
   if( filePath != '' && ! filePath.startsWith('"') && ! filePath.startsWith('#')
-     && ! filePath.startsWith('//')) {
+     && ! filePath.startsWith('//')) { // not a comment
     var request = new XMLHttpRequest()
     request.overrideMimeType("text/plain") // fixes err 'not well formed'
     request.open('GET', filePath, true)
-    request.onerror = function(error) {
-      console.error("Couldn't get a connection to '" + filePath + "'.")
-      console.error(error)
-    }
     request.onload = function() {
       if (request.status >= 200 && request.status < 400) {
         doSthWithText(request.responseText)
       }
-      else {
-        console.error("Couldn't load text of '" + filePath + "'.")
-      }
-    }
-    request.onerror = function(error) {
-      console.error("Couldn't get a connection to '" + filePath + "'.")
-      console.error(error)
     }
     request.send()
   } // not a comment
@@ -225,7 +198,7 @@ function loadFilesAndDoSthWithTexts(filePaths, doSthWithTexts) {
 function getScriptPaths(scriptPathsFile, doAfter) {
     loadFileAndDoSthWithText(scriptPathsFile, function(text) {
     text = text.split('\n')
-    scriptPaths.push.apply(scriptPaths, text) // append to scriptPaths
+    scriptPaths.push.apply(scriptPaths, text) // append text to scriptPaths
     doAfter()
   });
 }
@@ -276,8 +249,8 @@ function main() {
   setDocTitleToAppName()
 
   if(scriptPathsFile !== null ) getScriptPaths(scriptPathsFile, loadScripts)
-  else if(scriptPaths.length > 0) loadScripts()
-  else console.info('No script-paths found to be loaded.')
+
+  loadScripts()
 
   removeThisScriptEle()
 
