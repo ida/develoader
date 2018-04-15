@@ -74,11 +74,10 @@ How
 ===
 
 
-Usage
------
+Drop this file into any directory, to make it a develoading-app.
 
-Either write paths manually into a file named 'scripts.txt', or generate a
-file containing all found scripts of this directory, by opening a terminal
+Then either write paths manually into a file named 'scripts.txt', or generate
+a file, containing all found scripts of this directory, by opening a terminal
 and executing this:
 
     find . -type f -name "*.js" | sort -V > scripts.txt
@@ -94,30 +93,14 @@ can, but don't have to start with './'.
 You can also include external script-paths for loading dependency-scripts,
 their paths must start with '../' or 'http'.
 
-
-
-Technically
------------
-
-The local, internal app-scripts are composed to one script and then inserted
-as text-content of a script-element in the head-element.
-
-The external dependency-files are inserted as script-eles in the head-ele
-loading the script via the src-attribute, as convenient.
+Finally, open this file in a browser.
 
 
 
+Author
+=====
 
-Who
-===
-
-Ida Ebkes <contact@ida-ebkes.eu>
-
-
-When
-====
-
-This README was last touched by a human on 13th of April, 2018.
+Ida Ebkes <contact@ida-ebkes.eu>, 2018
 
 
 Repository
@@ -151,7 +134,7 @@ MIT, a copy is attached.
 
 
 
-var scriptWrapped = '' // for collecting contents of loaded scripts
+var script = ''
 
 
 
@@ -248,7 +231,7 @@ function loadFilesAndDoSthWithTexts(filePaths, doSthWithTexts) {
   var texts = ''
   function addTextToTexts(text) {
     texts += '\n' + text
-    scriptWrapped += '\n' + text
+    script += '\n' + text
     if(filePaths.length > 0) {
       loadFileAndDoSthWithText(filePaths.shift(), addTextToTexts)
     }
@@ -290,7 +273,6 @@ function main() {
 
   // Set script-begin:
   script = `function ${appName}(appName='${appName}') {`
-
 
   // If there's a script-paths-file, get paths of it, afterwards load scripts:
   if(scriptPathsFile !== null ) getScriptPaths(scriptPathsFile, loadScripts)
