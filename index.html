@@ -210,8 +210,7 @@ function loadFileAndDoSthWithText(filePath, doSthWithText) {
   filePath = filePath.trim()
   if( filePath != '' && ! filePath.startsWith('"') && ! filePath.startsWith('#')
      && ! filePath.startsWith('//')) { // not a comment
-    //if(filePath.endsWith('.js') && debug === true) addScriptEle(filePath)
-    if(filePath.endsWith('.js')) addScriptEle(filePath)
+    if(filePath.endsWith('.js') && debug === true) addScriptEle(filePath)
     var request = new XMLHttpRequest()
     request.overrideMimeType("text/plain") // fixes err 'not well formed'
     request.open('GET', filePath, true)
