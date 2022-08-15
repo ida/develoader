@@ -1,4 +1,4 @@
-<head><meta charset="utf-8"><title></title><script>
+<!doctype html><html><head><link rel="icon" href="data:,"><meta charset="utf-8"><title></title><script>
 
 // Load scripts listed in a file and wrap them into one function.
 
@@ -6,7 +6,7 @@ var scriptPathsFile = 'scripts.txt'   // File with a path per line (no quotes).
 var scriptPaths = []   // Optionally add paths here, they'll precede the above.
 var appName = null    // Defaults to dir-name, you can set any other name here.
 var download = false // Set to true, to download wrapped script after a reload.
-var debug = false   // Set to true, to load each path in a script-ele, no wrap.
+var debug = true//false   // Set to true, to load each path in a script-ele, no wrap.
 
 
 
@@ -53,7 +53,7 @@ Why
 
 
 2. No typing for registering scripts, as we can generate a paths-file.
-   Load-order can then automagically be defined by naming files, accordingly.
+   Load-order can then automagically be defined by naming files accordingly.
 
 
 3. Isolating scripts into one function keeps the global-namespace tidy.
@@ -88,10 +88,10 @@ load-order by choosing file-names acordingly. Version-numbers separated with
 dots work, too.
 
 The app's scripts are expected to live within this directory, their paths
-can, but don't have to start with './'.
+must be relative to it.
 
 You can also include external script-paths for loading dependency-scripts,
-their paths must start with './../' or 'http'.
+their paths must start with '../' or 'http'.
 
 Finally, open this file in a browser.
 
@@ -123,7 +123,7 @@ through my spam-killer-filters.
 License
 =======
 
-MIT, a copy is attached.
+MIT
 
 
 */
@@ -210,7 +210,7 @@ function loadFileAndDoSthWithText(filePath, doSthWithText) {
   filePath = filePath.trim()
   if( filePath != '' && ! filePath.startsWith('"') && ! filePath.startsWith('#')
      && ! filePath.startsWith('//')) { // not a comment
-    if(filePath.endsWith('.js') && debug === true) addScriptEle(filePath)
+    if(filePath.endsWith('.js') === true && debug === true) addScriptEle(filePath)
     var request = new XMLHttpRequest()
     request.overrideMimeType("text/plain") // fixes err 'not well formed'
     request.open('GET', filePath, true)
@@ -224,6 +224,7 @@ function loadFileAndDoSthWithText(filePath, doSthWithText) {
   else doSthWithText('') // we need to exe doSthWithText to keep the loop going
   }
 }
+
 
 
 function loadFilesAndDoSthWithTexts(filePaths, doSthWithTexts) {
@@ -244,11 +245,13 @@ function loadFilesAndDoSthWithTexts(filePaths, doSthWithTexts) {
 
 
 
-function wrapAndInsertScripts(scripts) {
+function doAfterScriptsLoaded() {
 
-  script += `}
+  script += `
+}
 
 ${appName}()`
+
 
   if(debug === false) addScriptEle(null, script)
 
@@ -257,7 +260,7 @@ ${appName}()`
 
 
 function loadScripts() {
-  loadFilesAndDoSthWithTexts(scriptPaths, wrapAndInsertScripts)
+  loadFilesAndDoSthWithTexts(scriptPaths, doAfterScriptsLoaded)
 }
 
 
@@ -288,4 +291,4 @@ function main() {
 main()
 
 
-</script></head>
+</script></head><body></body></html>
